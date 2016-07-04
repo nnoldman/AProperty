@@ -1,0 +1,4 @@
+D:\src\AProperty\AProperty\ClassLibrary1\bin\Debug\AProperty.dll
+D:\src\AProperty\AProperty\ClassLibrary1\bin\Debug\AProperty.pdb
+D:\src\AProperty\AProperty\ClassLibrary1\obj\Debug\AProperty.dll
+D:\src\AProperty\AProperty\ClassLibrary1\obj\Debug\AProperty.pdb
