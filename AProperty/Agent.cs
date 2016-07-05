@@ -9,6 +9,14 @@ namespace AProperty
 {
     public class Agent
     {
+        internal int mLV = 1;
+
+        public int LV
+        {
+            get { return mLV; }
+            set { mLV = value; }
+        }
+
         public static implicit operator bool(Agent agent)
         {
             return agent != null;
@@ -30,7 +38,7 @@ namespace AProperty
 
         public void AddEntity(Entity e)
         {
-            Debug.Assert(mPropertices.Find((item) => item.Property.Index == e.Property.Index) == null);
+            Debug.Assert(mPropertices.Find((item) => item.Index == e.Index) == null);
             e.Agent = this;
             mPropertices.Add(e);
         }
@@ -38,7 +46,7 @@ namespace AProperty
 
         public void AddModifier(Modifier modifier)
         {
-            Entity e = this.mPropertices.Find(item => item.Property.Index == modifier.TargetPropertyIndex);
+            Entity e = this.mPropertices.Find(item => item.Index == modifier.TargetPropertyIndex);
             e.AddModifier(modifier);
             this.Dirty = true;
         }
@@ -76,7 +84,7 @@ namespace AProperty
             {
                 foreach (var m in entity.Modifiers)
                 {
-                    m.Timer.AdvanceTime(deltaTimeMS);
+                    m.AdvanceTime(deltaTimeMS);
                 }
             }
         }

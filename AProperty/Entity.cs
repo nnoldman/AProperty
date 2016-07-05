@@ -10,19 +10,43 @@ namespace AProperty
     {
         public delegate void OnValueChange(double old, double cur);
 
-        internal Agent Agent;
-        public Prop Property { get; set; }
         public OnValueChange OnValueChanged;
-        internal bool mDirty = true;
-        internal int mLV;
-        internal double mFinalValue;
-        internal List<Modifier> mModifiers = new List<Modifier>();
 
         public List<Modifier> Modifiers
         {
             get { return mModifiers; }
         }
+        public int Index;
+        internal Agent Agent;
 
+        public double Max = double.MaxValue;
+        public double Min = 0;
+
+        List<Modifier> mModifiers = new List<Modifier>();
+        double mBaseValue;
+        double mGrowRate;
+        double mValue;
+        bool mDirty = true;
+
+        public double BaseValue
+        {
+            get { return mBaseValue; }
+            set { mBaseValue = value; }
+        }
+        public double BaseValueWithLV
+        {
+            get { return GetValue(Agent.LV); }
+        }
+        public double GrowRate
+        {
+            get { return mGrowRate; }
+            set { mGrowRate = value; }
+        }
+
+        public double GetValue(int lv)
+        {
+            return mBaseValue + mGrowRate * (lv - 1);
+        }
         double Clamp(double v, double min, double max)
         {
             if (v < min)
@@ -34,21 +58,21 @@ namespace AProperty
 
         internal void Recaculate()
         {
-            double oldValue = mFinalValue;
+            double oldValue = mValue;
 
-            double baseValue = BaseValue;
+            double baseValue = BaseValueWithLV;
 
             double grow = 0;
 
             foreach (var modifier in mModifiers)
-                grow += modifier.GetGrowValue(mLV, baseValue);
+                grow += modifier.GetGrowValue(baseValue);
 
-            mFinalValue = baseValue + grow;
-            mFinalValue = Clamp(mFinalValue, Property.Min, Property.Max);
+            mValue = baseValue + grow;
+            mValue = Clamp(mValue, Min, Max);
 
-            if (oldValue != mFinalValue)
+            if (oldValue != mValue)
                 if (OnValueChanged != null)
-                    OnValueChanged(oldValue, mFinalValue);
+                    OnValueChanged(oldValue, mValue);
         }
 
         public void AddModifier(Modifier modifer)
@@ -72,17 +96,6 @@ namespace AProperty
             }
         }
 
-        public int LV
-        {
-            get { return mLV; }
-            set { mLV = value; }
-        }
-
-        public double BaseValue
-        {
-            get { return Property.GetValue(mLV); }
-        }
-
         public double Value
         {
             get
@@ -92,7 +105,7 @@ namespace AProperty
                     Recaculate();
                     mDirty = false;
                 }
-                return mFinalValue;
+                return mValue;
             }
         }
     }

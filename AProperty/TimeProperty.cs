@@ -14,14 +14,13 @@ namespace AProperty
     }
     public class TimeProperty
     {
-        public double Value;
+        public double Value = 2000;
         public TimeType Type;
         internal Action OnTimer;
 
         internal enum LifeState
         {
-            None,
-            Running,
+            Alive,
             Die,
         }
 
@@ -30,13 +29,13 @@ namespace AProperty
             get { return mLife; }
         }
 
-        internal double mElapseTime;
+        internal double mElapseTime = 0;
 
-        internal LifeState mLife = LifeState.None;
+        internal LifeState mLife = LifeState.Alive;
 
-        internal void AdvanceTime(double deltaTimeMS)
+        internal bool AdvanceTime(double deltaTimeMS)
         {
-            if (mLife == LifeState.Running && this.Type == TimeType.Buffer)
+            if (mLife == LifeState.Alive && this.Type == TimeType.Buffer)
             {
                 int lastSecond = (int)(mElapseTime * 0.001);
                 
@@ -48,8 +47,12 @@ namespace AProperty
                     OnTimer();
 
                 if (mElapseTime > Value)
+                {
                     mLife = LifeState.Die;
+                    return true;
+                }
             }
+            return false;
         }
     }
 }

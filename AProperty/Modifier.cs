@@ -15,33 +15,40 @@ namespace AProperty
         public double GrowRate;
         public double BaseValue;
         public int TargetPropertyIndex;
+        public int LV;
 
-        internal abstract double GetGrowValue(int lv, double baseValue);
+        internal abstract double GetGrowValue(double baseValue);
+
+        internal void AdvanceTime(double deltaTimeMS)
+        {
+            if (this.Timer.AdvanceTime(deltaTimeMS))
+                this.Owner.Dirty = true;
+        }
     }
 
     public class FixedModifier : Modifier
     {
-        internal override double GetGrowValue(int lv, double baseValue)
+        internal override double GetGrowValue( double baseValue)
         {
-            return BaseValue + GrowRate * (lv - 1);
+            return BaseValue + GrowRate * (this.LV - 1);
         }
     }
 
     public class PercentModifier : Modifier
     {
-        internal override double GetGrowValue(int lv, double baseValue)
+        internal override double GetGrowValue(double baseValue)
         {
-            return baseValue * (BaseValue + GrowRate * (lv - 1)) * 0.01;
+            return baseValue * (BaseValue + GrowRate * (this.LV - 1)) * 0.01;
         }
     }
 
     public class PulseFixedModifer : Modifier
     {
-        internal PulseFixedModifer()
+        public PulseFixedModifer()
         {
             this.Timer.OnTimer = OnTimer;
         }
-        internal override double GetGrowValue(int lv, double baseValue)
+        internal override double GetGrowValue(double baseValue)
         {
             return 0;
         }
@@ -49,6 +56,10 @@ namespace AProperty
         internal void OnTimer()
         {
             FixedModifier modifier = new FixedModifier();
+            modifier.BaseValue = this.BaseValue;
+            modifier.GrowRate = this.GrowRate;
+            modifier.TargetPropertyIndex = this.TargetPropertyIndex;
+            modifier.SourceIndex = this.SourceIndex;
             modifier.Timer.Type = TimeType.Once;
             Owner.AddModifier(modifier);
         }

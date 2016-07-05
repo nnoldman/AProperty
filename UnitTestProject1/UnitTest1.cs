@@ -49,7 +49,7 @@ namespace UnitTestProject1
         [TestMethod]
         public void TestProp()
         {
-            Prop prop = new Prop();
+            Entity prop = new Entity();
             prop.BaseValue = 50;
             prop.GrowRate = 5;
 
@@ -61,14 +61,11 @@ namespace UnitTestProject1
         [TestMethod]
         public void TestEntity()
         {
-            Prop prop1 = new Prop();
+            Entity prop1 = new Entity();
             prop1.BaseValue = 50;
             prop1.GrowRate = 5;
             prop1.Index = (int)PropertyType.Attack;
 
-            Entity e = new Entity();
-            e.LV = 5;
-            e.Property = prop1;
 
             Modifier m1 = new FixedModifier();
             m1.TargetPropertyIndex = (int)PropertyType.Attack;
@@ -76,46 +73,55 @@ namespace UnitTestProject1
             m1.BaseValue = 10;
             m1.GrowRate = 1;
             m1.Timer.Type = TimeType.Forever;
+            m1.LV = 5;
 
-            e.AddModifier(m1);
+            prop1.AddModifier(m1);
 
-            Assert.AreEqual(e.Value, e.BaseValue + m1.BaseValue + (e.LV - 1) * m1.GrowRate);
+            AProperty.Agent agent = new AProperty.Agent();
+            agent.AddEntity(prop1);
+
+            Assert.AreEqual(prop1.Value, prop1.BaseValue + m1.BaseValue + (m1.LV - 1) * m1.GrowRate);
         }
 
         [TestMethod]
-        public void TestAgent()
+        public void TestPulseFixedModifer()
         {
-            Prop prop1 = new Prop();
-            prop1.BaseValue = 50;
-            prop1.GrowRate = 5;
-            prop1.Index = (int)PropertyType.Attack;
-
             Entity e1 = new Entity();
-            e1.LV = 5;
-            e1.Property = prop1;
+            e1.BaseValue = 50;
+            e1.GrowRate = 5;
+            e1.Index = (int)PropertyType.Attack;
 
-            Prop prop2 = new Prop();
-            prop2.BaseValue = 50;
-            prop2.GrowRate = 5;
-            prop2.Index = (int)PropertyType.Defence;
 
-            Entity e2 = new Entity();
-            e2.LV = 10;
-            e2.Property = prop2;
+            PulseFixedModifer m1 = new PulseFixedModifer();
+            m1.TargetPropertyIndex = (int)PropertyType.Attack;
+            m1.SourceIndex = (int)PropertySource.SkillBuffer;
+            m1.BaseValue = 10;
+            m1.GrowRate = 1;
+            m1.LV = 3;
+            m1.Timer.Type = TimeType.Buffer;
+            m1.Timer.Value = 2000;
 
-            Prop prop3 = new Prop();
-            prop3.BaseValue = 50;
-            prop3.GrowRate = 5;
-            prop3.Index = (int)PropertyType.HpMax;
-
-            Entity e3 = new Entity();
-            e3.LV = 15;
-            e3.Property = prop3;
+            e1.AddModifier(m1);
 
             AProperty.Agent agent = new AProperty.Agent();
+            agent.LV = 4;
             agent.AddEntity(e1);
-            agent.AddEntity(e2);
-            agent.AddEntity(e3);
+
+            agent.Update(500);
+
+            double basevalue = 50 + (4 - 1) * 5;
+            double modifierBaseValue = 10 + (3 - 1) * 1;
+
+            //agent.Update(500);
+            //agent.Update(500);
+            //agent.Update(500);
+            //agent.Update(500);
+            //Assert.AreEqual(e1.Value, basevalue);
+            //Assert.AreEqual(e1.Value, basevalue);
+            //agent.Update(500);
+            //Assert.AreEqual(e1.Value, basevalue);
+            //agent.Update(500);
+            //Assert.AreEqual(e1.Value, basevalue);
         }
     }
 }
