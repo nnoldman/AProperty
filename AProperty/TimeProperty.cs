@@ -33,6 +33,7 @@ namespace AProperty
 
         internal LifeState mLife = LifeState.Alive;
 
+
         internal bool AdvanceTime(double deltaTimeMS)
         {
             if (mLife == LifeState.Alive && this.Type == TimeType.Buffer)
