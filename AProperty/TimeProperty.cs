@@ -45,7 +45,6 @@ namespace AProperty
 
                 if (curSecond > lastSecond && OnTimer != null)
                     OnTimer();
-
                 if (mElapseTime > Value)
                 {
                     mLife = LifeState.Die;
